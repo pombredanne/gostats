@@ -1,0 +1,20 @@
+hash: 7d30f82ae5ff82a5c93db423dc7af1879f482dfc6c6a30f1778a21bf6d39b3d1
+updated: 2016-08-31T23:05:19.312112791+01:00
+imports:
+- name: github.com/daviddengcn/go-colortext
+  version: 511bcaf42ccd42c38aba7427b6673277bf19e2a1
+- name: github.com/google/go-github
+  version: a59a35745f99ad92d70d69a9f180767063aa4bf3
+  subpackages:
+  - github
+- name: github.com/google/go-querystring
+  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  subpackages:
+  - query
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/spf13/cobra
+  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
+- name: github.com/spf13/pflag
+  version: 103ce5cd2042f2fe629c1957abb64ab3e7f50235
+devImports: []

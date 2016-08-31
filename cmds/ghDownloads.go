@@ -17,6 +17,7 @@ package cmds
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/fabric8io/gostats/util"
 	"github.com/google/go-github/github"
@@ -41,6 +42,9 @@ func NewCmdGitHubDownloads() *cobra.Command {
 			repo := cmd.Flags().Lookup("repository").Value.String()
 			util.Infof("Getting release downloads numbers for GitHub project %s\n", repo)
 
+			org := strings.Split(repo, "/")[0]
+			project := strings.Split(repo, "/")[1]
+
 			client := github.NewClient(nil)
 
 			opt := &github.ListOptions{
@@ -50,7 +54,7 @@ func NewCmdGitHubDownloads() *cobra.Command {
 			// get all pages of results
 			var allReleases []*github.RepositoryRelease
 			for {
-				releases, resp, err := client.Repositories.ListReleases("fabric8io", "gofabric8", opt)
+				releases, resp, err := client.Repositories.ListReleases(org, project, opt)
 				if err != nil {
 					util.Errorf("Unable to list repositories by org %s %v", "fabric8io", err)
 				}
@@ -60,7 +64,7 @@ func NewCmdGitHubDownloads() *cobra.Command {
 				}
 				opt.Page = resp.NextPage
 			}
-
+			grandTotal := 0
 			var previousReleaseTimeStamp github.Timestamp
 			for v := range allReleases {
 				release := allReleases[v]
@@ -73,13 +77,22 @@ func NewCmdGitHubDownloads() *cobra.Command {
 						asset := release.Assets[w]
 						totalDownloadCount = totalDownloadCount + *asset.DownloadCount
 					}
-					//hours := strconv.FormatFloat(duration.Hours(), 'f', 6, 64)
+
 					d := duration.Hours() / 24
 					days := strconv.FormatFloat(d, 'f', 6, 64)
+
 					util.Infof("Tag %s published had %v downloads and was available for %s days\n", tag, totalDownloadCount, days)
+
+					// round teh days up to a whole number
+					// d2 := float64(int(d*100+0.5)) / 100
+					// downloadsPerday := totalDownloadCount / int(math.Ceil(d))
+					// util.Infof("Tag %s %v downloads p/d\n", tag, downloadsPerday)
 				}
 				previousReleaseTimeStamp = releaseDate
+				grandTotal = grandTotal + totalDownloadCount
 			}
+			util.Infof("\nGrand total of %v downloads\n", grandTotal)
+
 		},
 	}
 	cmd.PersistentFlags().StringP("repository", "r", "", "the GitHub repository to get the release download numbers e.g. fabric8io/gofabric8")
